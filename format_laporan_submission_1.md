@@ -17,14 +17,16 @@ Bagian laporan ini mencakup:
 ### Problem Statements
 
 Menjelaskan pernyataan masalah latar belakang:
-- Bagaimana cara memprediksi risiko seseorang mengidap penyakit jantung berdasarkan data klinis yang tersedia?
 
--Faktor apa yang memiliki pengaruh paling signifikan dalam meningkatkan potensi seseorang mengalami penyakit jantung?
+- Bagaimana cara memprediksi risiko seseorang mengidap penyakit jantung berdasarkan data klinis yang tersedia?
+- Faktor apa yang memiliki pengaruh paling signifikan dalam meningkatkan potensi seseorang mengalami penyakit jantung?
+- Bagaimana membangun model prediktif yang mampu mendeteksi risiko penyakit jantung secara otomatis?
 
 ### Goals
 
 Menjelaskan tujuan dari pernyataan masalah:
 - Membangun model Machine Learning yang akurat untuk melakukan prediksi risiko secara otomatis guna mendukung keputusan medis secara cepat dan tepat.
+- Mengidentifikasi variabel yang paling berkontribusi terhadap peningkatan risiko penyakit jantung, seperti tekanan darah, kadar kolesterol, dan parameter kesehatan lainnya.
 - Mengklasifikasikan individu ke dalam kelompok risiko tinggi dan rendah terhadap penyakit jantung berdasarkan atribut klinis dasar.
 
     ### Solution statements
