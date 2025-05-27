@@ -37,11 +37,12 @@ Menjelaskan tujuan dari pernyataan masalah:
 - Model dengan performa terbaik akan diuji dan divalidasi secara menyeluruh sebelum diintegrasikan ke dalam sistem pendukung keputusan, guna membantu proses deteksi dini dan diagnosis risiko penyakit jantung.
 
 ## Data Understanding
-dataset ini berisi pasien yang diduga mengidap penyakit jantung. struktur dataset ini memiliki lebih dari 70000 baris dan 13 kolom. dataset berasal dari [Kaggle Dataset](https://www.kaggle.com/datasets/sulianova/cardiovascular-disease-dataset).
+dataset ini berisi pasien yang diduga mengidap penyakit jantung. struktur dataset ini memiliki lebih dari 70000 baris dan 13 kolom. kondisi awal dataset ini tidak ada missing value dan data duplicated. dataset berasal dari [Kaggle Dataset](https://www.kaggle.com/datasets/sulianova/cardiovascular-disease-dataset).
 
 Selanjutnya uraikanlah seluruh variabel atau fitur pada data. Sebagai contoh:  
 
 ### Variabel-variabel pada cardiovascular dataset adalah sebagai berikut:
+- Id (no unik pasien) : setiap pasien memiliki no id yang berbeda (tipe data: integer)
 - Age (umur): Usia pasien cardiovascular (tipe data: integer).
 - Height (tinggi badan): Tinggi badan pasien dalam cm (integer).
 - Weight (berat badan): Berat badan pasien dalam kg (float).
@@ -73,6 +74,11 @@ cardio_disease.isnull().sum() kode ini digunakan untuk mengecek apakah ada nilai
 ### Cek Dupllikasi Data
 cardio_disease.duplicated().sum()) kode ini digunakan untuk mengecek berapa banyak baris yang mengalami duplikasi. proses ini dilakukan untuk menghindari model berlebihan yang sering muncul berulang ulang sehingga performa model menurun.
 
+### Menghapus Kolom
+cardio_disease.drop(['id', 'active', 'smoke', 'alco'], axis=1, inplace=True) mengahpus kolom yang tidak digunakan pada saat modeling prosses
+cardio_disease['age'] = (cardio_disease['age'] / 365).astype(int) mengubah age dari hari ke tahun
+cardio_disease['BMI'] = cardio_disease['weight'] / ((cardio_disease['height'] / 100) ** 2) membuat kolom baru bernama BMI
+
 ### Feature Scaling
 normalisasi yang mengubah nilai fitur numerik agar memiliki rata-rata 0 dan standar deviasi 1. Tujuan dilakukan feature scaling adalah untuk membuat semua fitur numerik berada dalam skala yang sebanding sehingga dapat meningkatkan performa dan kecepatan konvergensi algoritma selama training model dan untuk menghindari dominasi fitur dengan nilai besar terhadap fitur dengan nilai kecil dalam perhitungan jarak atau bobot.
 
@@ -82,15 +88,22 @@ Proses ini membagi dataset menjadi 80% data latih yang digunakan untuk melatih m
 ## Modeling
 
 ### XGBoost
+Parameter yang digunakan dalam proses pemodelan menggunakan XGBoost (Extreme Gradient Boosting) adalah use_label_encoder=False, eval_metric='logloss', dan random_state=42. Model ini merupakan algoritma boosting yang bekerja dengan cara membangun beberapa pohon keputusan secara bertahap, di mana setiap pohon baru mencoba memperbaiki kesalahan dari pohon sebelumnya. Parameter use_label_encoder=False digunakan untuk menonaktifkan encoder label bawaan yang sudah deprecated, sedangkan eval_metric='logloss' digunakan untuk mengukur kesalahan prediksi dalam bentuk logaritmik loss.
+
+Model ini dilatih menggunakan data pelatihan (X_train, y_train) dan diuji pada data pengujian X_test. Proses evaluasi dilakukan menggunakan beberapa metrik seperti akurasi, presisi, recall, F1-score, dan ROC AUC.
 mampu menangani data tidak seimbang, mendukung regularisasi (sehingga mengurangi overfitting), dan bekerja sangat baik pada data tabular. Namun, kekurangannya adalah waktu pelatihan yang relatif lamaa dibanding model lain, serta kompleksitas parameter yang tinggi yang membutuhkan tuning lebih cermat.
 
 ### LightGBM 
+Parameter yang digunakan dalam proses pemodelan menggunakan LightGBM (Light Gradient Boosting Machine) adalah random_state=42 yang digunakan untuk memastikan hasil yang konsisten saat model dilatih ulang. LightGBM merupakan algoritma boosting berbasis pohon keputusan yang dirancang untuk efisiensi dan kecepatan, terutama pada dataset berukuran besar. LightGBM menggunakan teknik histogram-based learning dan leaf-wise tree growth, yang membuatnya lebih cepat dan efisien dibandingkan metode boosting tradisional.
+
 Keunggulan LightGBM kecepatan training yang sangat tinggi, penggunaan memori yang lebih hemat, serta performa prediksi yang sangat kompetitif. Kekurangannya, LightGBM cenderung lebih sensitif terhadap data yang tidak terurut dan dapat menghasilkan hasil yang kurang stabil pada dataset kecil atau fitur kategorikal yang tidak ditangani dengan benar.
 
 ### Logistic Regression
+Model yang digunakan adalah Logistic Regression, dengan parameter max_iter=1000 untuk memastikan konvergensi model selama proses pelatihan dan random_state=42 untuk menjaga konsistensi hasil. Logistic Regression adalah algoritma klasifikasi linier yang paling sederhana namun sangat efektif, terutama ketika hubungan antara fitur dan target bersifat linier. Model ini menghitung probabilitas suatu kelas menggunakan fungsi sigmoid, yang membuatnya cocok untuk klasifikasi biner seperti prediksi penyakit jantung.
 Kelebihan dari model logistic regression adalah model cepat dilarih dan cocok untuk baseline model. Memberikan probabilitas, cocok untuk ROC AUC. Sedangkan kekurangan dari model ini adalah model ini tidak mampu menangkap hbungan non-linear yang kompleks sehingga performa model bisa buruk jika terdapat outlier ekstrem atau korelasi multikolinearitas tinggi.
 
 ### Random Forest
+Tahapan untuk membuat model RandomForestClassifier dengan parameter random_state=42 untuk memastikan hasil yang konsisten setiap kali model dijalankan. Random Forest adalah algoritma ensemble learning berbasis pohon keputusan (Decision Tree), yang membangun banyak pohon keputusan saat pelatihan dan menggabungkan prediksi dari semua pohon untuk menentukan hasil akhir. Pendekatan ini meningkatkan akurasi dan mengurangi risiko overfitting dibandingkan model pohon tunggal.
 Kelebihan random forest mampu menangani data yang kompleks, dapat menangai fitur numerikal dan kategorikal, serta relatif tahan terhadap overfitting. Akan tetapi, kekurangannya terletak pada kebutuhan memori yang tinggi, waktu prediksi yang bisa lebih lambat untuk model besar, dan interpretasi model yang tidak sesederhana logistic regression.
 
 **Rubrik/Kriteria Tambahan (Opsional)**: 
